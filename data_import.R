@@ -12,3 +12,6 @@ read_csv("One line of metadata
 read_csv("# A comment
          x,y,z
          1,2,3", comment = "#")
+
+read_csv("1,2,3\n4,5,6", col_names = FALSE)
+
