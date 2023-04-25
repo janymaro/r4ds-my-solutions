@@ -1,9 +1,13 @@
-library(tidyverse)
-library(hms)
+{
+  library(tidyverse)
+  library(hms)
+}
+
 
 parse_double("1.23")
 
 parse_double("1,23", locale = locale(decimal_mark = ','))
+
 
 d1 <- "January 1, 2010"
 d2 <- "2015-Mar-07"
@@ -21,3 +25,19 @@ parse_date(d5, "%m/%d/%y")
 
 parse_time(t1, "%H%M")
 parse_time(t2, "%H:%M:%OS %p")
+
+challenge <- read_csv(readr_example("challenge.csv"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
