@@ -26,18 +26,30 @@ parse_date(d5, "%m/%d/%y")
 parse_time(t1, "%H%M")
 parse_time(t2, "%H:%M:%OS %p")
 
-challenge <- read_csv(readr_example("challenge.csv"))
+challenge <- read_csv(
+  readr_example("challenge.csv"),
+  col_types = cols(
+    x = col_integer(),
+    y = col_character()
+  )
+)
 
+problems(challenge)
 
+challenge <- read_csv(
+  readr_example("challenge.csv"),
+  col_types = cols(
+    x = col_double(),
+    y = col_character()
+  )
+)
 
+tail(challenge)
 
-
-
-
-
-
-
-
-
-
-
+challenge <- read_csv(
+  readr_example("challenge.csv"),
+  col_types = cols(
+    x = col_double(),
+    y = col_date()
+  )
+)
