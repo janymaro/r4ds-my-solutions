@@ -1,5 +1,6 @@
 {
   library(tidyverse)
+  library(hexbin)
 }
 
 # Compute the rate for table2, and table4a + table4b. You will need to perform
@@ -79,7 +80,7 @@ pivot_wider(table2, names_from = 'type', values_from = 'count')
 
 # Exercises
 
-people <- tribble(
+tribble(
   ~name, ~key, ~value,
   #-----------------|--------|------
   "Phillip Woods", "age", 45,
@@ -87,22 +88,104 @@ people <- tribble(
   "Phillip Woods", "age", 50,
   "Jessica Cordero", "age", 37,
   "Jessica Cordero", "height", 156
-)
-
-people %>% 
+) %>% 
+print() %>% 
   group_by(name, key) %>% 
   mutate(obs = row_number()) %>% 
   pivot_wider(names_from = 'key', values_from = 'value') %>% 
   select(-obs)
 
 
-preg <- tribble(
+tribble(
   ~pregnant, ~male, ~female,
   'yes', NA, 10,
   'no', 20, 12
-)
-
-preg %>% 
+) %>%
+  print() %>% 
   pivot_longer(c('male', 'female'), names_to = 'sex', values_to = 'count')
 
 
+
+# <--    Push and Pull Unite Separate    -->
+
+
+table3 %>% 
+  separate(
+    rate,
+    into = c('cases', 'population'),
+    convert = TRUE
+  )
+
+table5 %>% 
+  unite(new, century, year, sep = '')
+
+tibble(x = c("a,b,c", "d,e,f,g", 'h,i,j')) %>% 
+  separate(x, c("one", "two", "three"), extra = "merge")
+
+tibble(x = c('a,b,c', 'd,e', 'f,g,i')) %>% 
+  separate(x, c('one', 'two', 'three'), fill = "left")
+
+# <--     Real Problem(who)     -->>
+
+(who1 <- who %>% 
+  pivot_longer(
+    new_sp_m014:newrel_f65,
+    names_to = 'key',
+    values_to = 'cases',
+    values_drop_na = TRUE
+  ) %>%
+  mutate(
+    key = stringr::str_replace(key, 'newrel', 'new_rel')
+  ) %>% 
+  separate(
+    key,
+    into = c('new', 'code', 'sex_age'),
+    sep = '_'
+  ) %>% 
+  select(-new, -iso2, -iso3) %>% 
+  separate(
+    sex_age,
+    into = c('sex', 'age'),
+    sep = 1
+  ))
+
+# For each country, year, sex compute the total number of cases. Make an
+# informative visualization of the data
+
+who_whitout_code <- who1 %>% 
+  group_by(country, year, sex) %>% 
+  summarise(cases = sum(cases)) %>% 
+  ungroup() 
+
+who_whitout_code %>% 
+  ggplot(aes(year, cases, color = sex)) +
+  geom_smooth(se = FALSE) +
+  coord_cartesian(xlim = c(1997, 2016)) +
+  facet_wrap(~country)
+
+who_whitout_code %>% 
+  ggplot(aes(year, cases, color = sex)) +
+  geom_line() +
+  facet_wrap(~country)
+
+
+
+
+# who1 %>% 
+#   group_by(country, year, sex) %>% 
+#   summarise(cases = sum(cases)) %>% 
+#   ungroup() %>% 
+#   ggplot(
+#     aes(
+#       cut_width(year, 1, boundary = 0), 
+#       cases,
+#       color = sex
+#     )
+#   ) +
+#   geom_boxplot() +
+#   coord_flip() +
+#   facet_wrap(~country)
+
+
+  
+  
