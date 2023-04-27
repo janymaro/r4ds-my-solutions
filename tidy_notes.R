@@ -45,3 +45,5 @@ table2 %>%
   ggplot(aes(year, cases)) +
   geom_line(aes(group = country), color = 'gray50') +
   geom_point(aes(color = country))
+
+
