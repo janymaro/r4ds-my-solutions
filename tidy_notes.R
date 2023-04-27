@@ -168,8 +168,16 @@ who_whitout_code %>%
   geom_line() +
   facet_wrap(~country)
 
-
-
+who_whitout_code %>% 
+  ggplot(aes(country, cases, fill = sex)) +
+  geom_col(position = 'dodge') +
+  coord_flip() +
+  facet_wrap(~cut_width(year, 1, boundary = 0))
+  
+who_whitout_code %>% 
+  ggplot(aes(cut_number(year, 6), country)) +
+  geom_tile(aes(fill = cases)) +
+  facet_wrap(~sex)
 
 # who1 %>% 
 #   group_by(country, year, sex) %>% 
