@@ -46,4 +46,63 @@ table2 %>%
   geom_line(aes(group = country), color = 'gray50') +
   geom_point(aes(color = country))
 
+# Old way
+table4a %>% 
+  gather(`1999`, `2000`, key='year', value='cases') %>% 
+  arrange(country)
+
+table4b %>% 
+  gather(2:3, key='year', value = 'population') %>% 
+  arrange(country)
+
+# Actual and correct way
+table4a %>% 
+  pivot_longer(c(`1999`, `2000`), names_to = 'year', values_to = 'cases')
+
+
+table4b %>% 
+  pivot_longer(2:3, names_to = 'year', values_to = 'population')
+
+tidy4 <- table4a %>% 
+  pivot_longer(2:3, names_to = 'year', values_to = 'cases') %>% 
+  left_join(pivot_longer(table4b, 2:3, names_to = 'year', values_to = 'population'),
+            by = c('year', 'country'))
+
+# Old way
+
+spread(table2, key = type, value = count)
+
+# Actual and correct way
+
+pivot_wider(table2, names_from = 'type', values_from = 'count')
+
+
+# Exercises
+
+people <- tribble(
+  ~name, ~key, ~value,
+  #-----------------|--------|------
+  "Phillip Woods", "age", 45,
+  "Phillip Woods", "height", 186,
+  "Phillip Woods", "age", 50,
+  "Jessica Cordero", "age", 37,
+  "Jessica Cordero", "height", 156
+)
+
+people %>% 
+  group_by(name, key) %>% 
+  mutate(obs = row_number()) %>% 
+  pivot_wider(names_from = 'key', values_from = 'value') %>% 
+  select(-obs)
+
+
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  'yes', NA, 10,
+  'no', 20, 12
+)
+
+preg %>% 
+  pivot_longer(c('male', 'female'), names_to = 'sex', values_to = 'count')
+
 
