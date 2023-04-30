@@ -41,6 +41,8 @@ airports %>%
 airports %>% 
   semi_join(flights, c('faa' = 'dest'))
 
+
+# arrow version
 flights %>% 
   select(
     flight,
@@ -76,6 +78,51 @@ flights %>%
     ),
     arrow = arrow(length = unit(0.1, 'cm'))
   ) +
-  coord_cartesian(xlim = c(-130, -70), ylim = c(25, 50)) +
+  coord_quickmap(xlim = c(-130, -70), ylim = c(25, 50))
+
+
+# Point version by size
+
+flights %>% 
+  select(
+    flight,
+    tailnum,
+    dep_delay,
+    arr_delay,
+    carrier, 
+    origin,
+    dest
+  ) %>%
+  group_by(dest) %>% 
+  summarise(
+    arr_delay_avg = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  ungroup() %>% 
+  inner_join(airports, by = c('dest' = 'faa')) %>% 
+  ggplot(aes(lon, lat)) +
+  borders('state') +
+  geom_point(aes(size = arr_delay_avg, alpha = 1/10)) +
   coord_quickmap()
 
+# By color
+
+flights %>% 
+  select(
+    flight,
+    tailnum,
+    dep_delay,
+    arr_delay,
+    carrier, 
+    origin,
+    dest
+  ) %>%
+  group_by(dest) %>% 
+  summarise(
+    arr_delay_avg = mean(arr_delay, na.rm = TRUE)
+  ) %>% 
+  ungroup() %>% 
+  inner_join(airports, by = c('dest' = 'faa')) %>% 
+  ggplot(aes(lon, lat)) +
+  borders('state') +
+  geom_point(aes(color = arr_delay_avg)) +
+  coord_quickmap()
