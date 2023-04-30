@@ -4,26 +4,25 @@
 }
 
 
-x <- tribble(
-  ~key, ~val_x,
-  1, "x1",
-  2, "x2",
-  2, "x3",
-  1, "x4"
+
+left_join(
+  tribble(       # x
+    ~key, ~val_x,
+    1, "x1",
+    2, "x2",
+    2, "x3",
+    1, "x4"
+  ),
+  tribble(      # y
+    ~key, ~val_y,
+    1, "y1",
+    2, "y2"
+  ),
+  by = 'key'
 )
 
-y <- tribble(
-  ~key, ~val_y,
-  1, "y1",
-  2, "y2"
-)
-
-left_join(x, y, by = 'key')
-
-flights2 <- flights %>% 
-  select(year:day, hour, origin, dest, tailnum, carrier)
-
-flights2 %>% 
+flights %>% 
+  select(year:day, hour, origin, dest, tailnum, carrier) %>% 
   left_join(weather)
 
 # Exercises
@@ -43,6 +42,7 @@ airports %>%
 
 
 # arrow version
+
 flights %>% 
   select(
     flight,
@@ -126,3 +126,21 @@ flights %>%
   borders('state') +
   geom_point(aes(color = arr_delay_avg)) +
   coord_quickmap()
+
+
+# Exercise 2: Add the location of the origin and destination (i.e, the lat and
+# lon) to flights
+
+flights %>% 
+  left_join(
+    airports %>% select(origin = faa, origin_lat = lat, origin_lon = lon),
+    by = 'origin'
+  ) %>% 
+  left_join(
+    airports %>% select(dest = faa, dest_lat = lat, dest_lon = lon),
+    by = 'dest'
+  )
+
+
+
+
