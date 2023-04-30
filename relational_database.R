@@ -141,6 +141,57 @@ flights %>%
     by = 'dest'
   )
 
+# Exercise 3: Is there a relationship between the age of a plane and its delays
 
+flights_with_age <- flights %>% 
+  select(
+    tailnum,
+    arr_delay,
+    dep_delay,
+    year
+  ) %>% 
+  inner_join(
+    select(planes, manufactured_year = year, tailnum),
+    by = 'tailnum'
+  ) %>% 
+  mutate(
+    age = year - manufactured_year
+  ) %>% 
+  select(-manufactured_year, -year) %>% 
+  filter(!is.na(age), !is.na(arr_delay), !is.na(dep_delay))
 
+# Total smooth plot arr_delay 
+flights_with_age %>% 
+  ggplot(aes(age, arr_delay)) +
+  geom_smooth()
+
+# Departure Delay
+flights_with_age %>% 
+  ggplot(aes(age, dep_delay)) +
+  geom_smooth()
+
+# Limited Age Histogram 
+flights_with_age %>% 
+  ggplot(aes(age)) +
+  geom_histogram() +
+  coord_cartesian(ylim = c(0, 5000))
+
+flights_with_age %>% 
+  group_by(age = cut_width(age, 5, boundary = 0)) %>% 
+  summarise(
+    n = n(),
+  )
+
+# Grouped by age and smooth graph
+
+flights_with_age %>% 
+  mutate(age = if_else(age > 30, 30L, age)) %>% 
+  group_by(age) %>% 
+  summarise(
+    n = n(),
+    arr_delay = mean(arr_delay),
+    dep_delay = mean(dep_delay)
+  ) %>% 
+  ggplot(aes(age, arr_delay)) +
+  geom_smooth()
 
