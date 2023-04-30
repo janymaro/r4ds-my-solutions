@@ -256,24 +256,50 @@ flights_weather %>%
   geom_smooth()
 
 # Precipitations
-flights_weather %>% 
-  filter(!is.na(precip)) %>% 
-  group_by(precip) %>% 
-  summarise(delay = mean(arr_delay)) %>% 
+flights_weather %>%
+  filter(!is.na(precip)) %>%
+  group_by(precip) %>%
+  summarise(delay = mean(arr_delay)) %>%
   ggplot(aes(precip, delay)) +
   geom_point() +
   geom_line() +
   geom_smooth()
 
 # Pressure
-flights_weather %>% 
-  filter(!is.na(pressure)) %>% 
-  group_by(pressure) %>% 
-  summarise(delay = mean(arr_delay)) %>% 
+flights_weather %>%
+  filter(!is.na(pressure)) %>%
+  group_by(pressure) %>%
+  summarise(delay = mean(arr_delay)) %>%
   ggplot(aes(pressure, delay)) +
   geom_point() +
-  geom_smooth()  
+  geom_smooth()
 
-flights_weather %>% 
-  ggplot(aes(pressure, precip)) +
-  geom_point()
+# Visibility
+flights_weather %>%
+  filter(!is.na(visib)) %>%
+  group_by(visib) %>%
+  summarise(delay = mean(arr_delay)) %>%
+  ggplot(aes(visib, delay)) +
+  geom_point() +
+  geom_line() +
+  geom_smooth()
+
+
+# Exercise 5: Display the spatial pattern of delays for June 13, 2013
+
+flights %>%
+  filter(month == 6, day == 13) %>%
+  select(year:day, hour, arr_delay, origin, dest) %>%
+  group_by(dest) %>% 
+  summarise(arr_delay = mean(arr_delay, na.rm = TRUE)) %>% 
+  inner_join(
+    select(airports, lat, lon, faa),
+    by = c('dest' = 'faa')) %>% 
+  ggplot(aes(lon, lat, size = arr_delay, colour = arr_delay)) +
+  geom_point() +
+  borders('state') +
+  coord_quickmap() + 
+  scale_colour_viridis_c()
+
+
+
