@@ -19,3 +19,63 @@ y <- tribble(
 )
 
 left_join(x, y, by = 'key')
+
+flights2 <- flights %>% 
+  select(year:day, hour, origin, dest, tailnum, carrier)
+
+flights2 %>% 
+  left_join(weather)
+
+# Exercises
+# Compute the average delay by destination, then join on the air
+# ports data frame so you can show the spatial distribution of delays. Here’s an
+# easy way to draw a map of the United States:
+
+airports %>% 
+  semi_join(flights, c("faa" = 'dest')) %>% 
+  ggplot(aes(lon, lat)) +
+  borders('state') +
+  geom_point() +
+  coord_quickmap()
+
+airports %>% 
+  semi_join(flights, c('faa' = 'dest'))
+
+flights %>% 
+  select(
+    flight,
+    tailnum,
+    dep_delay,
+    arr_delay,
+    carrier, 
+    origin,
+    dest
+  ) %>%
+  group_by(origin, dest) %>%
+  summarise(
+    arr_delay_avg = mean(arr_delay, na.rm = TRUE),
+  ) %>%
+  ungroup() %>% 
+  inner_join(
+    airports %>% select(faa, origin_lat = lat, origin_lon = lon),
+    by = c('origin' = 'faa')
+  ) %>% 
+  inner_join(
+    airports %>% select(faa, dest_lat = lat, dest_lon = lon),
+    by = c('dest' = 'faa')
+  ) %>%
+  ggplot() +
+  borders('state') +
+  geom_segment(
+    aes(
+      x = origin_lon,
+      y = origin_lat,
+      xend = dest_lon,
+      yend = dest_lat,
+      color = arr_delay_avg
+    ),
+    arrow = arrow(length = unit(0.1, 'cm'))
+  ) +
+  coord_cartesian(xlim = c(-130, -70), ylim = c(25, 50)) +
+  coord_quickmap()
+
