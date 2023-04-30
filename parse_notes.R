@@ -8,6 +8,8 @@ parse_double("1.23")
 
 parse_double("1,23", locale = locale(decimal_mark = ','))
 
+parse_number("1.23,2", locale = locale(grouping_mark = '.'))
+
 
 d1 <- "January 1, 2010"
 d2 <- "2015-Mar-07"
