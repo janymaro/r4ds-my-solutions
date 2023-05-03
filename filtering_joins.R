@@ -8,18 +8,20 @@ top <- flights %>%
   head(10)
 
 # Normal filter
+
 flights %>%
   filter(dest %in% top$dest)
 
 # Filter join
+
 flights %>%
   semi_join(top)
 
 
+
 # Find the 10 days with the highest average delay and filter
-
-
 # Normal filter
+
 flights %>%
   group_by(month, day) %>%
   mutate(
@@ -45,4 +47,36 @@ flights %>%
 
 
 # Exercises
-flights
+
+flights %>% 
+  anti_join(planes, by = 'tailnum') %>% 
+  select(year:day, carrier, flight, tailnum, origin, dest) %>% 
+  count(carrier, sort = TRUE)
+
+# Filter flights to only show flights with planes that have flown at least 100
+# flights
+
+flights %>%
+  semi_join(
+    flights %>% 
+      filter(!is.na(tailnum)) %>% 
+      count(tailnum) %>% 
+      filter(n >= 100)
+  )
+
+# Find the 48 hours that have the worst delays. Cross reference it with the
+# weather data
+
+worst_hours <- flights %>% 
+  select(origin, month, day, hour, dep_delay, sched_dep_time) %>% 
+  group_by(origin, month, day, hour) %>% 
+  summarise(dep_delay = mean(dep_delay)) %>% 
+  ungroup() %>% 
+  arrange(desc(dep_delay)) %>% 
+  head(48)
+
+weather %>% 
+  semi_join(worst_hours) %>% 
+  select(!c(origin:hour))
+
+
